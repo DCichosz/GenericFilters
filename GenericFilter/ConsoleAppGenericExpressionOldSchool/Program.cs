@@ -10,7 +10,7 @@ namespace ConsoleAppGenericExpressionOldSchool
 {
 	class Program
 	{
-		static async Task Main(string[] args)
+		static void Main(string[] args)
 		{
 			var gridOptions = new GridOptions
 			{
@@ -23,19 +23,13 @@ namespace ConsoleAppGenericExpressionOldSchool
 				{
 					new GridFilter
 					{
-						Field = "Name.Length.Chuk",
+						Field = "Name.Length",
 						FilterMethod = FilterMethods.Equal,
 						Value = "4"
-					},
-					new GridFilter
-					{
-						Field = "Value",
-						FilterMethod = FilterMethods.Equal,
-						Value = "2"
 					}
 				}
 			};
-			var cos = "2";
+
 			var list = TestModel.CreateElements(10);
 			list.Insert(0, new TestModel { Boolean = true, Date = DateTime.Now.AddDays(-5), Name = "test", Value = 2 });
 			list.Insert(0, new TestModel { Boolean = true, Date = DateTime.Now.AddDays(-5), Name = "test", Value = 3 });

@@ -5,6 +5,8 @@ using System.Linq.Expressions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using ConsoleAppRoslynStringToExpression.Grid;
+using ConsoleAppRoslynStringToExpression.Grid.GridOptions;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 

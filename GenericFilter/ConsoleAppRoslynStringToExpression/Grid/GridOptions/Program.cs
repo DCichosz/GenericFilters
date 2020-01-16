@@ -10,7 +10,7 @@ namespace ConsoleAppRoslynStringToExpression.Grid.GridOptions
 {
 	class Program
 	{
-		static async Task Main(string[] args)
+		async Task Main(string[] args)
 		{
 			var gridOptions = new ConsoleAppRoslynStringToExpression.GridOptions
 			{
@@ -30,8 +30,8 @@ namespace ConsoleAppRoslynStringToExpression.Grid.GridOptions
 				}
 			};
 			var list = TestModel.CreateElements(10);
-			var expression = CSharpScript
-				.EvaluateAsync<Func<TestModel, int>>("x=>x.Value", ScriptOptions.Default.AddReferences(typeof(TestModel).Assembly)).Result;
+			var expression = await CSharpScript
+				.EvaluateAsync<Func<TestModel, int>>("x=>x.Value", ScriptOptions.Default.AddReferences(typeof(TestModel).Assembly));
 
 			var lista = list.AsQueryable().ApplyDatabaseDataFilters(gridOptions.Filters).ToList();
 			//var lista = list.AsQueryable().ApplyDatabaseDataOrder(gridOptions.Order).ToList();
