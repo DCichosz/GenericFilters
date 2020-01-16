@@ -53,8 +53,10 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid
 			};
 
 			GetExpressionPropertyWithParameter(typeof(TDbModel), order.OrderBy, out var type, out var parameter, out var propertyExpression);
+
 			var orderByExpression = Expression.Lambda(propertyExpression, parameter);
-			var resultExpression = Expression.Call(typeof(Queryable), command, new[] { type, order.GetLastChildrenFieldType() },
+
+			var resultExpression = Expression.Call(typeof(Queryable), command, new[] { type, order.GetLastChildrenFieldType() ?? propertyExpression.Type },
 				query.Expression, Expression.Quote(orderByExpression));
 			return (IOrderedQueryable<TDbModel>)query.Provider.CreateQuery<TDbModel>(resultExpression);
 		}
