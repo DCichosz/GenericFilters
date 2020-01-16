@@ -18,7 +18,7 @@ namespace ConsoleAppRoslynStringToExpression.Grid.GridOptions
 		private Type LastChildrenFieldType { get; set; }
 		public object GetConvertedValueOrNull<TDbModel>()
 		{
-			if (!Field.IsNullOrEmpty() && !Value.IsNullOrEmpty() && typeof(TDbModel).GetProperties().FirstOrDefault(prop => prop.Name == GetParentFieldName()) is var property && property != null)
+			if (!Field.IsNullOrEmpty() && !Value.IsNullOrEmpty() && typeof(TDbModel).GetProperties().FirstOrDefault(prop => string.Equals(prop.Name, GetParentFieldName(), StringComparison.OrdinalIgnoreCase)) is var property && property != null)
 			{
 				if (IsNestedObject() && !CheckChildNodes(property, GetChildrenFieldsNames(Field)))
 					return null;
@@ -28,15 +28,18 @@ namespace ConsoleAppRoslynStringToExpression.Grid.GridOptions
 				fieldType = FilterMethod == FilterMethods.Contains || FilterMethod == FilterMethods.StartsWith ||
 							FilterMethod == FilterMethods.EndsWith || FilterMethod == FilterMethods.Equals ? typeof(string) : fieldType;
 
-				if (TypeDescriptor.GetConverter(fieldType) is var converter)
-					return converter.IsValid(Value) ? converter.ConvertFromInvariantString(Value) : null;
+				if (TypeDescriptor.GetConverter(fieldType) is var converter && converter.IsValid(Value))
+				{
+					Field = property.Name;
+					return converter.ConvertFromInvariantString(Value);
+				}
 			}
 			return null;
 		}
 
 		public bool CanConvertValue<TDbModel>()
 		{
-			if (!Field.IsNullOrEmpty() && !Value.IsNullOrEmpty() && typeof(TDbModel).GetProperties().FirstOrDefault(prop => prop.Name == GetParentFieldName()) is var property && property != null)
+			if (!Field.IsNullOrEmpty() && !Value.IsNullOrEmpty() && typeof(TDbModel).GetProperties().FirstOrDefault(prop => string.Equals(prop.Name, GetParentFieldName(), StringComparison.OrdinalIgnoreCase)) is var property && property != null)
 			{
 				if (IsNestedObject() && !CheckChildNodes(property, GetChildrenFieldsNames(Field)))
 					return false;
