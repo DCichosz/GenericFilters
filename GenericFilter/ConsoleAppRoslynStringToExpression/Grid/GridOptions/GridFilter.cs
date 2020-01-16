@@ -14,13 +14,15 @@ namespace ConsoleAppRoslynStringToExpression.Grid.GridOptions
 		public bool IsNestedObject() => Field.Contains('.');
 		public string GetParentFieldName() => Field.Contains('.') ? Field.Split('.').First() : Field;
 		public string[] GetChildrenFieldsNames() => GetChildrenFieldsNames(Field);
+		public Type GetLastChildrenFieldType() => LastChildrenFieldType;
+
 		public string GetLastChildrenFieldName() => GetChildrenFieldsNames()?.LastOrDefault();
 		private Type LastChildrenFieldType { get; set; }
 		public object GetConvertedValueOrNull<TDbModel>()
 		{
 			if (!Field.IsNullOrEmpty() && !Value.IsNullOrEmpty() && typeof(TDbModel).GetProperties().FirstOrDefault(prop => string.Equals(prop.Name, GetParentFieldName(), StringComparison.OrdinalIgnoreCase)) is var property && property != null)
 			{
-				if (IsNestedObject() && !CheckChildNodes(property, GetChildrenFieldsNames(Field)))
+				if (IsNestedObject() && !CheckChildNodesAndSetLastChildFieldType(property, GetChildrenFieldsNames(Field)))
 					return null;
 
 				var fieldType = LastChildrenFieldType ?? property.PropertyType;
@@ -41,13 +43,13 @@ namespace ConsoleAppRoslynStringToExpression.Grid.GridOptions
 		{
 			if (!Field.IsNullOrEmpty() && !Value.IsNullOrEmpty() && typeof(TDbModel).GetProperties().FirstOrDefault(prop => string.Equals(prop.Name, GetParentFieldName(), StringComparison.OrdinalIgnoreCase)) is var property && property != null)
 			{
-				if (IsNestedObject() && !CheckChildNodes(property, GetChildrenFieldsNames(Field)))
+				if (IsNestedObject() && !CheckChildNodesAndSetLastChildFieldType(property, GetChildrenFieldsNames(Field)))
 					return false;
 
 				var fieldType = LastChildrenFieldType ?? property.PropertyType;
 
 				fieldType = FilterMethod == FilterMethods.Contains || FilterMethod == FilterMethods.StartsWith ||
-				            FilterMethod == FilterMethods.EndsWith || FilterMethod == FilterMethods.Equals ? typeof(string) : fieldType;
+							FilterMethod == FilterMethods.EndsWith || FilterMethod == FilterMethods.Equals ? typeof(string) : fieldType;
 
 				if (TypeDescriptor.GetConverter(fieldType) is var converter)
 					return converter.IsValid(Value);
@@ -55,7 +57,7 @@ namespace ConsoleAppRoslynStringToExpression.Grid.GridOptions
 			return false;
 		}
 
-		private bool CheckChildNodes(PropertyInfo parentField, string[] childrenFieldsNames)
+		public bool CheckChildNodesAndSetLastChildFieldType(PropertyInfo parentField, string[] childrenFieldsNames)
 		{
 			var result = false;
 			if (childrenFieldsNames?.Length > 0)

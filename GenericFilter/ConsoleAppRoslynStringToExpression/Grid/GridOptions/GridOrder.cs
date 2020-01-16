@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reflection;
 
 namespace ConsoleAppRoslynStringToExpression.Grid.GridOptions
@@ -10,7 +11,9 @@ namespace ConsoleAppRoslynStringToExpression.Grid.GridOptions
 		public bool IsNestedObject() => OrderBy.Contains('.');
 		public string GetParentFieldName() => OrderBy.Contains('.') ? OrderBy.Split('.').First() : OrderBy;
 		public string[] GetChildrenFieldsNames() => GetChildrenFieldsNames(OrderBy);
-		public bool CheckChildNodes(PropertyInfo parentField, string[] childrenFieldsNames)
+		public Type GetLastChildrenFieldType() => throw new NotImplementedException("Ni ma");
+
+		public bool CheckChildNodesAndSetLastChildFieldType(PropertyInfo parentField, string[] childrenFieldsNames)
 		{
 			var result = false;
 			if (childrenFieldsNames?.Length > 0)

@@ -1,6 +1,6 @@
 ﻿namespace ConsoleAppRoslynStringToExpression.Grid.GridOptions
 {
-	public interface IOrderable
+	public interface IOrderable : INestedTypesGridOptions
 	{
 		string OrderBy { get; set; }
 		OrderChoice Order { get; set; }

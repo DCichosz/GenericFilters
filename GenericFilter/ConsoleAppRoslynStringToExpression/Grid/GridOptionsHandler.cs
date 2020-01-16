@@ -28,7 +28,7 @@ namespace ConsoleAppRoslynStringToExpression.Grid
 						StringComparison.OrdinalIgnoreCase)) is var property) ||
 				property == null) return query;
 
-			if (order.IsNestedObject() && !order.CheckChildNodes(property, order.GetChildrenFieldsNames()))
+			if (order.IsNestedObject() && !order.CheckChildNodesAndSetLastChildFieldType(property, order.GetChildrenFieldsNames()))
 				return query;
 			return query.GetOrderByDynamicQuery(order);
 		}
