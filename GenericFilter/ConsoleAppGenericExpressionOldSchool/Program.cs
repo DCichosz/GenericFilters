@@ -16,16 +16,16 @@ namespace ConsoleAppGenericExpressionOldSchool
 			{
 				Order = new GridOrder
 				{
-					OrderBy = "Date.Date",
+					OrderBy = "date.Dupa",
 					Order = OrderChoice.Descending
 				},
 				Filters = new List<GridFilter>
 				{
 					new GridFilter
 					{
-						Field = "Name.Length",
+						Field = "Date.Date.Month",
 						FilterMethod = FilterMethods.Equal,
-						Value = "4"
+						Value = "2"
 					}
 				}
 			};
@@ -33,6 +33,7 @@ namespace ConsoleAppGenericExpressionOldSchool
 			var list = TestModel.CreateElements(10);
 			list.Insert(0, new TestModel { Boolean = true, Date = DateTime.Now.AddDays(-5), Name = "test", Value = 2 });
 			list.Insert(0, new TestModel { Boolean = true, Date = DateTime.Now.AddDays(-5), Name = "test", Value = 3 });
+			list.Insert(0, new TestModel { Boolean = true, Date = DateTime.Now.AddMonths(1), Name = "test", Value = 3 });
 			list.Insert(0, new TestModel { Boolean = true, Date = DateTime.Now.AddDays(-5), Name = "testd2", Value = 2 });
 			var lista = list.AsQueryable().ApplyDatabaseDataOrder(gridOptions.Order).ApplyDatabaseDataFilters(gridOptions.Filters).ToList();
 			lista.ForEach(x => Console.WriteLine(JsonSerializer.Serialize(x)));

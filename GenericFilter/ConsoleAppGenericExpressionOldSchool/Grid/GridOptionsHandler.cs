@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Castle.Core.Internal;
 using ConsoleAppGenericExpressionOldSchool.Grid.GridOptions;
 
 namespace ConsoleAppGenericExpressionOldSchool.Grid
@@ -18,9 +19,9 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid
 		public static IQueryable<TDbModel> ApplyDatabaseDataOrder<TDbModel>(this IQueryable<TDbModel> query, GridOrder order)
 		where TDbModel : class
 		{
-			if (order == null || !(typeof(TDbModel).GetProperties()
-				    .FirstOrDefault(prop => prop.Name == order?.GetParentFieldName()) is var property) ||
-			    property == null) return query;
+			if (order == null || order.OrderBy.IsNullOrEmpty() || !(typeof(TDbModel).GetProperties()
+					.FirstOrDefault(prop => string.Equals(prop.Name, order.GetParentFieldName(), StringComparison.OrdinalIgnoreCase)) is var property) ||
+				property == null) return query;
 
 			if (order.IsNestedObject() && !order.CheckChildNodes(property, order.GetChildrenFieldsNames()))
 				return query;
