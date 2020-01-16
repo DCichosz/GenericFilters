@@ -14,14 +14,13 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid.GridOptions
 		public bool IsNestedObject() => Field.Contains('.');
 		public string GetParentFieldName() => Field.Contains('.') ? Field.Split('.').First() : Field;
 		public string[] GetChildrenFieldsNames() => GetChildrenFieldsNames(Field);
-		public string GetLastChildrenFieldName() => GetChildrenFieldsNames()?.LastOrDefault();
 		private Type LastChildrenFieldType { get; set; }
 
 		public bool CanConvertValue<TDbModel>()
 		{
 			if (!Field.IsNullOrEmpty() && !Value.IsNullOrEmpty() && typeof(TDbModel).GetProperties().FirstOrDefault(prop => string.Equals(prop.Name, GetParentFieldName(), StringComparison.OrdinalIgnoreCase)) is var property && property != null)
 			{
-				if (IsNestedObject() && !CheckChildNodes(property, GetChildrenFieldsNames(Field)))
+				if (IsNestedObject() && !CheckChildNodesAndSetLastChildFieldType(property, GetChildrenFieldsNames(Field)))
 					return false;
 
 				var fieldType = LastChildrenFieldType ?? property.PropertyType;
@@ -39,7 +38,7 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid.GridOptions
 		{
 			if (!Field.IsNullOrEmpty() && !Value.IsNullOrEmpty() && typeof(TDbModel).GetProperties().FirstOrDefault(prop => string.Equals(prop.Name, GetParentFieldName(), StringComparison.OrdinalIgnoreCase)) is var property && property != null)
 			{
-				if (IsNestedObject() && !CheckChildNodes(property, GetChildrenFieldsNames(Field)))
+				if (IsNestedObject() && !CheckChildNodesAndSetLastChildFieldType(property, GetChildrenFieldsNames(Field)))
 					return null;
 
 				var fieldType = LastChildrenFieldType ?? property.PropertyType;
@@ -56,7 +55,7 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid.GridOptions
 			return null;
 		}
 
-		private bool CheckChildNodes(PropertyInfo parentField, string[] childrenFieldsNames)
+		public bool CheckChildNodesAndSetLastChildFieldType(PropertyInfo parentField, string[] childrenFieldsNames)
 		{
 			var result = false;
 			if (childrenFieldsNames?.Length > 0)

@@ -11,10 +11,8 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid.GridOptions
 		public bool IsNestedObject() => OrderBy.Contains('.');
 		public string GetParentFieldName() => OrderBy.Contains('.') ? OrderBy.Split('.').First() : OrderBy;
 		public string[] GetChildrenFieldsNames() => GetChildrenFieldsNames(OrderBy);
-		public string GetLastChildrenFieldName() => GetChildrenFieldsNames()?.LastOrDefault();
 		public Type GetLastChildrenFieldType() => _lastChildrenFieldType;
-		public void SetLastChildrenFieldType(Type fieldType) => _lastChildrenFieldType = fieldType;
-		public bool CheckChildNodes(PropertyInfo parentField, string[] childrenFieldsNames)
+		public bool CheckChildNodesAndSetLastChildFieldType(PropertyInfo parentField, string[] childrenFieldsNames)
 		{
 			var result = false;
 			if (childrenFieldsNames?.Length > 0)

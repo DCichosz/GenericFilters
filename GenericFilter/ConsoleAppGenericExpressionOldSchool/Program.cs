@@ -19,15 +19,15 @@ namespace ConsoleAppGenericExpressionOldSchool
 					OrderBy = "Date.Date",
 					Order = OrderChoice.Descending
 				},
-				//Filters = new List<GridFilter>
-				//{
-				//	new GridFilter
-				//	{
-				//		Field = "Date.Date.Month",
-				//		FilterMethod = FilterMethods.Equal,
-				//		Value = "2"
-				//	}
-				//}
+				Filters = new List<GridFilter>
+				{
+					new GridFilter
+					{
+						Field = "Date.Date.Month",
+						FilterMethod = FilterMethods.Equal,
+						Value = "2"
+					}
+				}
 			};
 
 			var list = TestModel.CreateElements(10);
