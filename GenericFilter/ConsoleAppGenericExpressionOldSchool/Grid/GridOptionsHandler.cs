@@ -34,7 +34,7 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid
 			{
 				gridFilters.ToList().ForEach(filter =>
 				{
-					if (filter.GetConvertedValueOrNull<TDbModel>() != null)
+					if (filter.CanConvertValue<TDbModel>())
 						query = query.ApplyFilter(filter);
 				});
 			}
@@ -64,7 +64,7 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid
 			GetExpressionPropertyWithParameter(typeof(TDbModel), filter.Field, out _, out var parameter, out var propertyExpression);
 			try
 			{
-				var cos = filter.FilterMethod switch
+				return filter.FilterMethod switch
 				{
 					FilterMethods.Equal => query.Where(GetDynamicWhereExpression<TDbModel>(Expression.Equal, parameter,
 						propertyExpression, filter.GetConvertedValueOrNull<TDbModel>())),
@@ -93,7 +93,6 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid
 					FilterMethods.Default => query,
 					_ => query
 				};
-				return cos;
 			}
 			catch (InvalidOperationException) { /* Prevent from blocking data - user-friendly , need refactor */}
 			return query;
