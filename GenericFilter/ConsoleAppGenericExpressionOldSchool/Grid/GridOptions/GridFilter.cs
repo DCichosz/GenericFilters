@@ -14,6 +14,8 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid.GridOptions
 		public bool IsNestedObject() => Field.Contains('.');
 		public string GetParentFieldName() => Field.Contains('.') ? Field.Split('.').First() : Field;
 		public string[] GetChildrenFieldsNames() => GetChildrenFieldsNames(Field);
+		public Type GetLastChildrenFieldType() => LastChildrenFieldType;
+
 		private Type LastChildrenFieldType { get; set; }
 
 		public bool CanConvertValue<TDbModel>()

@@ -12,7 +12,7 @@ namespace ConsoleAppRoslynStringToExpression
 {
 	class Program
 	{
-		static async Task Main(string[] args)
+		static void Main(string[] args)
 		{
 			var gridOptions = new GridOptions
 			{
