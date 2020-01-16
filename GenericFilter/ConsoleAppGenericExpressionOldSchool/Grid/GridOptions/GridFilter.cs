@@ -56,7 +56,7 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid.GridOptions
 		private bool CheckChildNodes(PropertyInfo parentField, string[] childrenFieldsNames)
 		{
 			var result = false;
-			if (childrenFieldsNames != null && childrenFieldsNames.Length > 0)
+			if (childrenFieldsNames?.Length > 0)
 			{
 				foreach (var childrenFieldName in childrenFieldsNames)
 				{

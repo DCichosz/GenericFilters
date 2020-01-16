@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -18,7 +17,7 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid.GridOptions
 		public bool CheckChildNodes(PropertyInfo parentField, string[] childrenFieldsNames)
 		{
 			var result = false;
-			if (childrenFieldsNames != null && childrenFieldsNames.Length > 0)
+			if (childrenFieldsNames?.Length > 0)
 			{
 				foreach (var childrenFieldName in childrenFieldsNames)
 				{

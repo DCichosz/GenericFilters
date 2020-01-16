@@ -13,7 +13,7 @@ namespace ConsoleAppRoslynStringToExpression.Grid.GridOptions
 		public bool CheckChildNodes(PropertyInfo parentField, string[] childrenFieldsNames)
 		{
 			var result = false;
-			if (childrenFieldsNames != null && childrenFieldsNames.Length > 0)
+			if (childrenFieldsNames?.Length > 0)
 			{
 				childrenFieldsNames.ToList().ForEach(childrenFieldName =>
 						result = parentField.PropertyType.GetProperties()
