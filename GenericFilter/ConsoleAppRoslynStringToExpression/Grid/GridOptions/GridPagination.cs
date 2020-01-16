@@ -1,4 +1,4 @@
-﻿namespace ConsoleAppRoslynStringToExpression
+﻿namespace ConsoleAppRoslynStringToExpression.Grid.GridOptions
 {
 	public class GridPagination : IPageable
 	{

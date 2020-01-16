@@ -3,44 +3,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using ConsoleAppGenericExpressionOldSchool.Grid;
-using ConsoleAppGenericExpressionOldSchool.Grid.GridOptions;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
 
-namespace ConsoleAppGenericExpressionOldSchool
+namespace ConsoleAppRoslynStringToExpression.Grid.GridOptions
 {
 	class Program
 	{
 		static async Task Main(string[] args)
 		{
-			var gridOptions = new GridOptions
+			var gridOptions = new ConsoleAppRoslynStringToExpression.GridOptions
 			{
 				Order = new GridOrder
 				{
 					OrderBy = "Date.Date",
-					Order = OrderChoice.Descending
+					Order = OrderChoice.Ascending
 				},
 				Filters = new List<GridFilter>
 				{
 					new GridFilter
 					{
-						Field = "Name.Length.Chuk",
-						FilterMethod = FilterMethods.Equal,
-						Value = "4"
-					},
-					new GridFilter
-					{
 						Field = "Value",
-						FilterMethod = FilterMethods.Equal,
-						Value = "2"
+						FilterMethod = FilterMethods.Contains,
+						Value = "7"
 					}
 				}
 			};
-			var cos = "2";
 			var list = TestModel.CreateElements(10);
-			list.Insert(0, new TestModel { Boolean = true, Date = DateTime.Now.AddDays(-5), Name = "test", Value = 2 });
-			list.Insert(0, new TestModel { Boolean = true, Date = DateTime.Now.AddDays(-5), Name = "test", Value = 3 });
-			list.Insert(0, new TestModel { Boolean = true, Date = DateTime.Now.AddDays(-5), Name = "testd2", Value = 2 });
-			var lista = list.AsQueryable().ApplyDatabaseDataOrder(gridOptions.Order).ApplyDatabaseDataFilters(gridOptions.Filters).ToList();
+			var expression = CSharpScript
+				.EvaluateAsync<Func<TestModel, int>>("x=>x.Value", ScriptOptions.Default.AddReferences(typeof(TestModel).Assembly)).Result;
+
+			var lista = list.AsQueryable().ApplyDatabaseDataFilters(gridOptions.Filters).ToList();
+			//var lista = list.AsQueryable().ApplyDatabaseDataOrder(gridOptions.Order).ToList();
 			lista.ForEach(x => Console.WriteLine(JsonSerializer.Serialize(x)));
 			Console.ReadLine();
 		}

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Castle.Core.Internal;
 
-namespace ConsoleAppRoslynStringToExpression
+namespace ConsoleAppRoslynStringToExpression.Grid.GridOptions
 {
 	public class GridFilter : IFilterable
 	{
@@ -48,6 +48,7 @@ namespace ConsoleAppRoslynStringToExpression
 					}
 					else
 					{
+						result = false;
 						break;
 					}
 				}
@@ -57,6 +58,14 @@ namespace ConsoleAppRoslynStringToExpression
 			return result;
 		}
 
-		private string[] GetChildrenFieldsNames(string field) => (!string.IsNullOrEmpty(field) && field.Contains('.') ? Field.Split('.') : null) is var result ? result?.Where(x => x != result[0])?.ToArray() : null;
+		private string[] GetChildrenFieldsNames(string field)
+		{
+			if (string.IsNullOrEmpty(field) || !field.Contains('.'))
+				return null;
+
+			var result = field.Split('.').ToList();
+			result.RemoveAt(0);
+			return result.ToArray();
+		}
 	}
 }

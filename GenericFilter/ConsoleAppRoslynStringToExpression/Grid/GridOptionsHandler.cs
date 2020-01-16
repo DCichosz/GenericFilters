@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using ConsoleAppRoslynStringToExpression.Grid.GridOptions;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 
-namespace ConsoleAppRoslynStringToExpression
+namespace ConsoleAppRoslynStringToExpression.Grid
 {
 	public static class GridOptionsHandler
 	{
@@ -19,15 +20,13 @@ namespace ConsoleAppRoslynStringToExpression
 		public static IQueryable<TDbModel> ApplyDatabaseDataOrder<TDbModel>(this IQueryable<TDbModel> query, GridOrder order)
 			where TDbModel : class
 		{
-			if (order != null && typeof(TDbModel).GetProperties()
-					.FirstOrDefault(prop => prop.Name == order?.GetParentFieldName()) is var property &&
-				property != null)
-			{
-				if(order.IsNestedObject() && order.CheckChildNodes(property, order.GetChildrenFieldsNames()))
-					return query.GetOrderByDynamicQuery(order);
-			}
+			if (order == null || !(typeof(TDbModel).GetProperties()
+					.FirstOrDefault(prop => prop.Name == order?.GetParentFieldName()) is var property) ||
+				property == null) return query;
 
-			return query;
+			if (order.IsNestedObject() && !order.CheckChildNodes(property, order.GetChildrenFieldsNames()))
+				return query;
+			return query.GetOrderByDynamicQuery(order);
 		}
 
 		public static IQueryable<TDbModel> ApplyDatabaseDataFilters<TDbModel>(this IQueryable<TDbModel> query,
@@ -60,11 +59,16 @@ namespace ConsoleAppRoslynStringToExpression
 			GridFilter filter) where TDbModel : class
 		{
 			GetExpressionPropertyWithParameter(typeof(TDbModel), filter.Field, out _, out var parameter, out var propertyExpression);
+			var field = propertyExpression.Type != typeof(string) ? $"{filter.Field}.ToString()" : filter.Field;
+			// zajebiste
+			// tera wykryjesz zmiany??
 			try
 			{
 				var cos = filter.FilterMethod switch
 				{
-					FilterMethods.Equal => query.Where(CSharpScript.EvaluateAsync<Expression<Func<TDbModel, bool>>>($"x=>x.{filter.Field} == \"{filter.Value}\"", ScriptOptions.Default.AddReferences(typeof(TDbModel).Assembly)).Result),
+					FilterMethods.Equal => query.Where(CSharpScript
+						.EvaluateAsync<Expression<Func<TDbModel, bool>>>($"x=>x.{filter.Field} == \"{filter.Field}\"",
+							ScriptOptions.Default.AddReferences(typeof(TDbModel).Assembly)).Result),
 					FilterMethods.NotEqual => query.Where(GetDynamicWhereExpression<TDbModel>(Expression.NotEqual,
 						parameter,
 						propertyExpression, filter.GetConvertedValueOrNull<TDbModel>())),
@@ -81,8 +85,14 @@ namespace ConsoleAppRoslynStringToExpression
 						parameter, propertyExpression, filter.GetConvertedValueOrNull<TDbModel>())),
 					FilterMethods.Equals => query.Where(GetStringExpression<TDbModel>(parameter,
 						propertyExpression, nameof(FilterMethods.Equals), filter.GetConvertedValueOrNull<TDbModel>())),
-					FilterMethods.Contains => query.Where(GetStringExpression<TDbModel>(parameter,
-						propertyExpression, nameof(FilterMethods.Contains), filter.GetConvertedValueOrNull<TDbModel>())),
+
+					FilterMethods.Contains => query.Where(CSharpScript
+						.EvaluateAsync<Expression<Func<TDbModel, bool>>>($"x=>x.{field}.Contains(\"{filter.Value}\")",
+							ScriptOptions.Default.AddReferences(typeof(TDbModel).Assembly)).Result),
+
+
+					//FilterMethods.Contains => query.Where(GetStringExpression<TDbModel>(parameter,
+					//	propertyExpression, nameof(FilterMethods.Contains), filter.GetConvertedValueOrNull<TDbModel>())),
 					FilterMethods.StartsWith => query.Where(GetStringExpression<TDbModel>(parameter,
 						propertyExpression, nameof(FilterMethods.StartsWith), filter.GetConvertedValueOrNull<TDbModel>())),
 					FilterMethods.EndsWith => query.Where(GetStringExpression<TDbModel>(parameter,
