@@ -25,7 +25,7 @@ namespace ConsoleAppRoslynStringToExpression
 				{
 					new GridFilter
 					{
-						Field = "Name",
+						Field = "name",
 						FilterMethod = FilterMethods.Equal,
 						Value = "Name1"
 					}

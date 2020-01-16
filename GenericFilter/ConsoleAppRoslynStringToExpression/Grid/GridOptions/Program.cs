@@ -32,7 +32,6 @@ namespace ConsoleAppRoslynStringToExpression.Grid.GridOptions
 			var list = TestModel.CreateElements(10);
 			var expression = await CSharpScript
 				.EvaluateAsync<Func<TestModel, int>>("x=>x.Value", ScriptOptions.Default.AddReferences(typeof(TestModel).Assembly));
-
 			var lista = list.AsQueryable().ApplyDatabaseDataFilters(gridOptions.Filters).ToList();
 			//var lista = list.AsQueryable().ApplyDatabaseDataOrder(gridOptions.Order).ToList();
 			lista.ForEach(x => Console.WriteLine(JsonSerializer.Serialize(x)));
