@@ -40,29 +40,23 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid.GridOptions
 
 		public object GetConvertedValueOrNull<TDbModel>()
 		{
-			if (!Field.IsNullOrEmpty() && !Value.IsNullOrEmpty() &&
-			    typeof(TDbModel).GetProperties().FirstOrDefault(prop =>
-					    string.Equals(prop.Name, GetParentFieldName(), StringComparison.OrdinalIgnoreCase)) is var
-				    property && property != null)
+			if (!Field.IsNullOrEmpty() && !Value.IsNullOrEmpty() && typeof(TDbModel).GetProperties().FirstOrDefault(prop => string.Equals(prop.Name, GetParentFieldName(), StringComparison.OrdinalIgnoreCase)) is var property && property != null)
 			{
-				if (IsNestedObject() &&
-				    !CheckChildNodesAndSetLastChildFieldType(property, GetChildrenFieldsNames(Field)))
-					return false;
+				if (IsNestedObject() && !CheckChildNodesAndSetLastChildFieldType(property, GetChildrenFieldsNames(Field)))
+					return null;
 
 				var fieldType = LastChildrenFieldType ?? property.PropertyType;
 
 				fieldType = FilterMethod == FilterMethods.Contains || FilterMethod == FilterMethods.StartsWith ||
-				            FilterMethod == FilterMethods.EndsWith || FilterMethod == FilterMethods.Equals
-					? typeof(string)
-					: fieldType;
+				            FilterMethod == FilterMethods.EndsWith || FilterMethod == FilterMethods.Equals ? typeof(string) : fieldType;
 
-				return TypeDescriptor.GetConverter(fieldType) is var converter &&
-				       (property.PropertyType.BaseType == typeof(Enum) && int.TryParse(Value, out var intVal)
-					       ? converter.IsValid(intVal)
-					       : converter.IsValid(Value));
+				if (TypeDescriptor.GetConverter(fieldType) is var converter && ((property.PropertyType.BaseType == typeof(Enum) && int.TryParse(Value, out var intVal) && converter.IsValid(intVal)) || converter.IsValid(Value)))
+				{
+					Field = property.Name;
+					return converter.ConvertFromInvariantString(Value);
+				}
 			}
-
-			return false;
+			return null;
 		}
 
 		public bool CheckChildNodesAndSetLastChildFieldType(PropertyInfo parentField, string[] childrenFieldsNames)
