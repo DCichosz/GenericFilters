@@ -23,7 +23,7 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid
 			{
 				gridOrderCollection.ToList().ForEach(gridOrder =>
 				{
-					if (gridOrder.CanOrderBy<TDbModel>())
+					if (gridOrder?.CanOrderBy<TDbModel>() == true)
 						query = gridOrderCollection.IndexOf(gridOrder) == 0
 							? query.GetOrderByDynamicQuery(gridOrder)
 							: query.GetOrderByDynamicQuery(gridOrder, false);
@@ -39,7 +39,7 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid
 			{
 				gridFilters.ToList().ForEach(filter =>
 				{
-					if (filter.CanConvertValue<TDbModel>())
+					if (filter?.CanConvertValue<TDbModel>() == true)
 						query = query.ApplyFilter(filter.ShallowCopy());
 				});
 			}
