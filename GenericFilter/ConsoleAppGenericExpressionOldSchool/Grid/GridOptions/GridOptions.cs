@@ -13,7 +13,7 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid.GridOptions
 	where TIFilterable : class, IFilterable
 	{
 		public TIPageable Pagination { get; set; }
-		public TIOrderable Order { get; set; }
+		public ICollection<TIOrderable> Order { get; set; }
 		public ICollection<TIFilterable> Filters { get; set; }
 	}
 }

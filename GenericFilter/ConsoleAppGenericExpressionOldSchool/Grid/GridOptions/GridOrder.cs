@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using Castle.Core.Internal;
 
 namespace ConsoleAppGenericExpressionOldSchool.Grid.GridOptions
 {
@@ -34,6 +35,15 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid.GridOptions
 			_lastChildrenFieldType = parentField.PropertyType;
 			return result;
 		}
+		public bool CanOrderBy<TDbModel>()
+		{
+			if (OrderBy.IsNullOrEmpty() || !(typeof(TDbModel).GetProperties()
+					.FirstOrDefault(prop => string.Equals(prop.Name, GetParentFieldName(), StringComparison.OrdinalIgnoreCase)) is var property) ||
+				property == null) return false;
+
+			return !IsNestedObject() || CheckChildNodesAndSetLastChildFieldType(property, GetChildrenFieldsNames());
+		}
+
 		private Type _lastChildrenFieldType { get; set; }
 		private string[] GetChildrenFieldsNames(string field)
 		{

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Castle.Core.Internal;
 using ConsoleAppGenericExpressionOldSchool.Grid.GridOptions;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace ConsoleAppGenericExpressionOldSchool.Grid
 {
@@ -16,16 +16,20 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid
 					.Take(pagination.PageSize)
 				: query;
 
-		public static IQueryable<TDbModel> ApplyDatabaseDataOrder<TDbModel>(this IQueryable<TDbModel> query, GridOrder order)
-		where TDbModel : class
+		public static IQueryable<TDbModel> ApplyDatabaseDataOrder<TDbModel>(this IQueryable<TDbModel> query, ICollection<GridOrder> gridOrderCollection)
+			where TDbModel : class
 		{
-			if (order == null || order.OrderBy.IsNullOrEmpty() || !(typeof(TDbModel).GetProperties()
-					.FirstOrDefault(prop => string.Equals(prop.Name, order.GetParentFieldName(), StringComparison.OrdinalIgnoreCase)) is var property) ||
-				property == null) return query;
-
-			if (order.IsNestedObject() && !order.CheckChildNodesAndSetLastChildFieldType(property, order.GetChildrenFieldsNames()))
-				return query;
-			return query.GetOrderByDynamicQuery(order);
+			if (gridOrderCollection?.Count > 0)
+			{
+				gridOrderCollection.ToList().ForEach(gridOrder =>
+				{
+					if (gridOrder.CanOrderBy<TDbModel>())
+						query = gridOrderCollection.IndexOf(gridOrder) == 0
+							? query.GetOrderByDynamicQuery(gridOrder)
+							: query.GetOrderByDynamicQuery(gridOrder, false);
+				});
+			}
+			return query;
 		}
 
 		public static IQueryable<TDbModel> ApplyDatabaseDataFilters<TDbModel>(this IQueryable<TDbModel> query,
@@ -42,14 +46,17 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid
 			return query;
 		}
 
-		private static IOrderedQueryable<TDbModel> GetOrderByDynamicQuery<TDbModel>(this IQueryable<TDbModel> query, GridOrder order)
+		private static IOrderedQueryable<TDbModel> GetOrderByDynamicQuery<TDbModel>(this IQueryable<TDbModel> query, GridOrder order, bool isFirstOrder = true)
 			where TDbModel : class
 		{
 			var command = order.Order switch
 			{
-				OrderChoice.Ascending => "OrderBy",
-				OrderChoice.Descending => "OrderByDescending",
-				_ => "OrderBy"
+				OrderChoice.Ascending when isFirstOrder => "OrderBy",
+				OrderChoice.Descending when isFirstOrder => "OrderByDescending",
+				OrderChoice.Ascending when !isFirstOrder => "ThenBy",
+				OrderChoice.Descending when !isFirstOrder => "ThenByDescending",
+				_ when isFirstOrder => "OrderBy",
+				_ when !isFirstOrder => "ThenBy"
 			};
 
 			GetExpressionPropertyWithParameter(typeof(TDbModel), order.OrderBy, out var type, out var parameter, out var propertyExpression);

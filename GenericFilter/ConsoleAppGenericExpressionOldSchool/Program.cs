@@ -1,4 +1,8 @@
-﻿using ConsoleAppGenericExpressionOldSchool.Grid;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using ConsoleAppGenericExpressionOldSchool.Grid;
 using ConsoleAppGenericExpressionOldSchool.Grid.GridOptions;
 
 namespace ConsoleAppGenericExpressionOldSchool
@@ -9,10 +13,13 @@ namespace ConsoleAppGenericExpressionOldSchool
 		{
 			var gridOptions = new GridOptions
 			{
-				Order = new GridOrder
+				Order = new List<GridOrder>
 				{
-					OrderBy = "Date.Date",
-					Order = OrderChoice.Descending
+					new GridOrder
+					{
+						Order = OrderChoice.Ascending,
+						OrderBy = "Name"
+					}
 				},
 				Filters = new List<GridFilter>
 				{

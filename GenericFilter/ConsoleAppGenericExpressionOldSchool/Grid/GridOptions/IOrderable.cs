@@ -7,5 +7,6 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid.GridOptions
 	{
 		string OrderBy { get; set; }
 		OrderChoice Order { get; set; }
+		bool CanOrderBy<TDbModel>();
 	}
 }
