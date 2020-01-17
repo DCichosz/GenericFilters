@@ -19,17 +19,22 @@ namespace ConsoleAppGenericExpressionOldSchool
 					{
 						Order = OrderChoice.Ascending,
 						OrderBy = "Name"
+					},
+					new GridOrder
+					{
+						Order = OrderChoice.Ascending,
+						OrderBy = "Value"
 					}
 				},
-				Filters = new List<GridFilter>
-				{
-					new GridFilter
-					{
-						Field = "Date.Date.Month",
-						FilterMethod = FilterMethods.Equal,
-						Value = "2"
-					}
-				}
+				//Filters = new List<GridFilter>
+				//{
+				//	new GridFilter
+				//	{
+				//		Field = "Date.Date.Month",
+				//		FilterMethod = FilterMethods.Equal,
+				//		Value = "2"
+				//	}
+				//}
 			};
 
 			var list = TestModel.CreateElements(10);
@@ -37,6 +42,7 @@ namespace ConsoleAppGenericExpressionOldSchool
 			list.Insert(0, new TestModel { Boolean = true, Date = DateTime.Now.AddDays(-5), Name = "test", Value = 3 });
 			list.Insert(0, new TestModel { Boolean = true, Date = DateTime.Now.AddMonths(1), Name = "test", Value = 3 });
 			list.Insert(0, new TestModel { Boolean = true, Date = DateTime.Now.AddDays(-5), Name = "testd2", Value = 2 });
+			list.Insert(0, new TestModel { Boolean = true, Date = DateTime.Now.AddDays(-5), Name = "Name3", Value = 2 });
 			var lista = list.AsQueryable().ApplyDatabaseDataOrder(gridOptions.Order).ApplyDatabaseDataFilters(gridOptions.Filters).ToList();
 			lista.ForEach(x => Console.WriteLine(JsonSerializer.Serialize(x)));
 			Console.ReadLine();
@@ -45,6 +51,7 @@ namespace ConsoleAppGenericExpressionOldSchool
 
 	public class TestModel
 	{
+		public int Id { get; set; }
 		public string Name { get; set; }
 		public int Value { get; set; }
 		public bool Boolean { get; set; }
