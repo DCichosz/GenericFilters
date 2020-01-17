@@ -83,6 +83,9 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid.GridOptions
 			return result;
 		}
 
+		// Need to be applied if u want to pass always same data to new query from method argument 
+		public GridFilter ShallowCopy() => (GridFilter)this.MemberwiseClone();
+
 		private string[] GetChildrenFieldsNames(string field)
 		{
 			if (string.IsNullOrEmpty(field) || !field.Contains('.'))

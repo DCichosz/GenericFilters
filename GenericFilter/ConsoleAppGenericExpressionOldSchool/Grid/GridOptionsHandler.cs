@@ -36,7 +36,7 @@ namespace ConsoleAppGenericExpressionOldSchool.Grid
 				gridFilters.ToList().ForEach(filter =>
 				{
 					if (filter.CanConvertValue<TDbModel>())
-						query = query.ApplyFilter(filter);
+						query = query.ApplyFilter(filter.ShallowCopy());
 				});
 			}
 			return query;
